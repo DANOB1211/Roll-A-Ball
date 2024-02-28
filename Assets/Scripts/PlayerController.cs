@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,17 +11,26 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     public int pickUpCount;
     private Timer timer;
+
+    [Header("UI")]
+    public TMP_Text pickUpText;
+    public TMP_Text timerText;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         //Get the number of pick ups in our scene
-        pickUpCount = GameObject.FindGameObjectsWithTag("Pick Up").Length;
+        pickUpCount = GameObject.FindGameObjectsWithTag("Pickup").Length;
         //Run the Check Pickups Function
         CheckPickUps();
         //Get the timer object and start the timer
         timer = FindObjectOfType<Timer>();
         timer.StartTimer();
 
+    }
+
+    private void LateUpdate()
+    {
+        timerText.text = "Time:  " +  timer.GetTime().ToString("F2");
     }
 
     // Update is called once per frame
@@ -41,8 +51,7 @@ public class PlayerController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(
-      other.gameObject.CompareTag("Pickup"))
+        if(other.gameObject.CompareTag("Pickup"))
         {
             //Destroy the collided object
             Destroy(other.gameObject);
@@ -55,9 +64,11 @@ public class PlayerController : MonoBehaviour
   
     void CheckPickUps()
     {
+        pickUpText.text = "Pick Ups Left: " + pickUpCount;
         print("Pick Ups Left: " + pickUpCount);
         if (pickUpCount == 0)
         {
+            pickUpText.color = Color.yellow;
             timer.StopTimer();
             print("Yay! You Won");
         }
