@@ -11,12 +11,21 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     public int pickUpCount;
     private Timer timer;
+    private bool gameOver = false;
 
     [Header("UI")]
     public TMP_Text pickUpText;
     public TMP_Text timerText;
+    public TMP_Text winTimeText;
+    public GameObject winPanel;
+    public GameObject inGamePanel;
     void Start()
     {
+        //Turn off our in game panel
+        inGamePanel.SetActive(true);
+        //Turn off our win panel
+        winPanel.SetActive(false);
+        
         rb = GetComponent<Rigidbody>();
         //Get the number of pick ups in our scene
         pickUpCount = GameObject.FindGameObjectsWithTag("Pickup").Length;
@@ -41,6 +50,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (gameOver == true)
+            return;
+
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
 
@@ -68,10 +80,34 @@ public class PlayerController : MonoBehaviour
         print("Pick Ups Left: " + pickUpCount);
         if (pickUpCount == 0)
         {
-            pickUpText.color = Color.yellow;
-            timer.StopTimer();
-            print("Yay! You Won");
+            WinGame();
         }
     }
+   void WinGame()
+    {
+        //Set our game over to true
+        gameOver = true;
+        //Turn off our in game panel
+        inGamePanel.SetActive(false);
+        //Turn off our win panel
+        winPanel.SetActive(true);
+        //Stop the timer
+        timer.StopTimer();
+        //Display our time to the win time text
+        winTimeText.text = "Your Time: " + timer.GetTime().ToString("F2");
 
+        //Stop the ball from moving
+        rb.velocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+    }
+public void RestartGame()
+    {
+        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+public void QuitGame()
+    {
+        Application.Quit();
+    }
 }
+
